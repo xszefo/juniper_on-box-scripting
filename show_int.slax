@@ -19,8 +19,10 @@ match  /  {
 					expr name;
 				}
 			}
-			var $temp = jcs:output($name);
-			
+			var $ip = {
+				expr address-family/interface-address/ifa-local;
+			}
+			var $temp = jcs:output($name _ " " _ $ip);
 		}
 	}
 }
