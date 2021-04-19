@@ -13,6 +13,14 @@ match  /  {
 			}
 		}
 		var $out = jcs:invoke($rpc);
-		var $temp = jcs:output($out);	
+		for-each ($out/physical-interface/logical-interface) {
+	         	var $name =	{
+				if(name) {
+					expr name;
+				}
+			}
+			var $temp = jcs:output($name);
+			
+		}
 	}
 }
