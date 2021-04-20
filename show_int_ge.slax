@@ -11,9 +11,10 @@ var $rpc = {
 	}
 }
 
+var $out = jcs:invoke($rpc);
+
 match  /  {
 	<op-script-results> {
-		var $out = jcs:invoke($rpc);
 		for-each ($out/physical-interface/logical-interface) {
 	         	var $name ={
 				expr name;

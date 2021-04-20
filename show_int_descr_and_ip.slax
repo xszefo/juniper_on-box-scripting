@@ -1,0 +1,38 @@
+version 1.1;
+ns junos = "http://xml.juniper.net/junos/*/junos";
+ns xnm = "http://xml.juniper.net/xnm/1.1/xnm";
+ns jcs = "http://xml.juniper.net/junos/commit-scripts/1.0";
+
+import "../import/junos.xsl";
+
+var $rpc_descr = {
+	<get-interface-information> {
+		<descriptions>;
+	}
+}
+
+var $rpc_terse = {
+	<get-interface-information> {
+		<terse>;
+	}
+}
+
+
+match  /  {
+	<op-script-results> {
+		var $out_descr = jcs:invoke($rpc_descr);
+		var $out_terse = jcs:invoke($rpc_terse);
+
+		for-each ($out_descr/physical-interface) {
+	         	var $name ={
+				expr name;
+				}
+			var $description = {
+				expr description;
+			}
+			var $ip = $out_terse/physical-interface[name==$name]/logical-interface/address-family/interface-address/ifa-local;
+
+			var $temp = jcs:output($name _ " " _ $description _ " " _ $ip);
+		}
+	}
+}
