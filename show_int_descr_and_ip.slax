@@ -32,7 +32,7 @@ match  /  {
 			}
 			var $ip = $out_terse/physical-interface[name==$name]/logical-interface/address-family/interface-address/ifa-local;
 			if (description) {
-			<output> jcs:printf($name _ " " _ $description _ " " _ $ip);
+			<output> jcs:printf("%s %s %s", $name, $description, $ip);
 				}
 		}
 	}
