@@ -31,8 +31,9 @@ match  /  {
 				expr description;
 			}
 			var $ip = $out_terse/physical-interface[name==$name]/logical-interface/address-family/interface-address/ifa-local;
-
-			var $temp = jcs:output($name _ " " _ $description _ " " _ $ip);
+			if (description) {
+			<output> jcs:printf($name _ " " _ $description _ " " _ $ip);
+				}
 		}
 	}
 }
