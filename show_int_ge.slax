@@ -5,19 +5,19 @@ ns jcs = "http://xml.juniper.net/junos/commit-scripts/1.0";
 
 import "../import/junos.xsl";
 
+var $rpc = {
+	<get-interface-information> {
+		<terse>;
+	}
+}
+
 match  /  {
 	<op-script-results> {
-		var $rpc = {
-           		 <get-interface-information> {
-                		<terse>;
-			}
-		}
 		var $out = jcs:invoke($rpc);
 		for-each ($out/physical-interface/logical-interface) {
 	         	var $name ={
 				expr name;
 				}
-			
 			var $ip = {
 				expr address-family/interface-address/ifa-local;
 			}
