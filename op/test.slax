@@ -1,0 +1,32 @@
+version 1.1;
+ns junos = "http://xml.juniper.net/junos/*/junos";
+ns xnm = "http://xml.juniper.net/xnm/1.1/xnm";
+ns jcs = "http://xml.juniper.net/junos/commit-scripts/1.0";
+
+import "../import/junos.xsl";
+
+var $rpc = {
+	<get-interface-information> {
+		<extensive>;
+	}
+}
+
+match  /  {
+	<op-script-results> {
+		var $out = jcs:invoke($rpc);
+		<output> jcs:printf("%-10s %-6s %-10s %-6s", "Interface", "MTU", "Speed", "Drops");			
+
+		for-each ($out/physical-interface) {
+	         	var $name = name;
+			var $mtu = mtu;
+			var $speed = speed;
+			var $drops = output-error-list/output-drops;
+			/* Pierwsze dwie litery oznaczaja typ interfejsu, np. ge, xe, et itd. */	
+			var $type = substring($name, 1, 2);
+
+			if ($type == "ge" || $type == "xe" || $type == "et") {
+				<output> jcs:printf("%-10s %-6s %-10s %-6s", $name, $mtu, $speed, $drops);
+			}
+		}
+	}
+}
