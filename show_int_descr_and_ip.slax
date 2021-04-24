@@ -24,13 +24,10 @@ match  /  {
 		var $out_terse = jcs:invoke($rpc_terse);
 
 		for-each ($out_descr/physical-interface) {
-	         	var $name ={
-				expr name;
-				}
-			var $description = {
-				expr description;
-			}
+	         	var $name = name;
+			var $description = description;
 			var $ip = $out_terse/physical-interface[name==$name]/logical-interface/address-family/interface-address/ifa-local;
+			
 			if (description) {
 			<output> jcs:printf("%-10s %-10s %10s", $name, $description, $ip);
 				}
