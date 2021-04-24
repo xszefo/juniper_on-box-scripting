@@ -14,16 +14,17 @@ var $rpc = {
 match  /  {
 	<op-script-results> {
 		var $out = jcs:invoke($rpc);
+		<output> jcs:printf("%-10s %-6s %-6s", "Interface", "MTU", "Drops");			
 
 		for-each ($out/physical-interface) {
 	         	var $name = name;
 			var $mtu = mtu;
-			
+			var $drops = output-error-list/output-drops;
 			/* Pierwsze dwie litery oznaczaja typ interfejsu, np. ge, xe, et itd. */	
 			var $type = substring($name, 1, 2);
 
 			if ($type == "ge" || $type == "xe" || $type == "et") {
-				<output> jcs:printf("%-10s %-10s", $name, $mtu);
+				<output> jcs:printf("%-10s %-6s %-6s", $name, $mtu, $drops);
 			}
 		}
 	}
