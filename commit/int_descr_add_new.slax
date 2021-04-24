@@ -1,0 +1,21 @@
+version 1.1;
+ns junos = "http://xml.juniper.net/junos/*/junos";
+ns xnm = "http://xml.juniper.net/xnm/1.1/xnm";
+ns jcs = "http://xml.juniper.net/junos/commit-scripts/1.0";
+
+import "../import/junos.xsl";
+
+match configuration {
+	for-each(interfaces/interface) {
+		if (jcs:empty(description)) {
+			<xnm:warning> {
+				call jcs:edit-path();
+				<message> name _ ' does not have a description! Adding description: unknown device.';
+			}
+			var $change = {
+				<description> 'unknown device';
+			}			
+			call jcs:emit-change($content = $change); 
+		}
+	}
+}
