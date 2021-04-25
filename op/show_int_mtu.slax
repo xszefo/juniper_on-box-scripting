@@ -11,22 +11,38 @@ var $rpc = {
 	}
 }
 
+param $interface = 'all';
+
 match  /  {
 	<op-script-results> {
 		var $out = jcs:invoke($rpc);
+		
 		<output> jcs:printf("%-10s %-6s %-10s %-6s", "Interface", "MTU", "Speed", "Drops");			
 
-		for-each ($out/physical-interface) {
-	         	var $name = name;
-			var $mtu = mtu;
-			var $speed = speed;
-			var $drops = output-error-list/output-drops;
+		if ($interface == 'all') {
+			for-each ($out/physical-interface) {
+				var $name = name;
+				var $mtu = mtu;
+				var $speed = speed;
+				var $drops = output-error-list/output-drops;
+				/* Pierwsze dwie litery oznaczaja typ interfejsu, np. ge, xe, et itd. */	
+				var $type = substring($name, 1, 2);
+
+				if ($type == "ge" || $type == "xe" || $type == "et") {
+					<output> jcs:printf("%-10s %-6s %-10s %-6s", $name, $mtu, $speed, $drops);
+				}
+			}
+		}
+		else {
+			var $interface_detail = $out/physical-interface[name==$interface];
+			var $name = $interface_detail/name;
+			var $mtu = $interface_detail/mtu;
+			var $speed = $interface_detail/speed;
+			var $drops = $interface_detail/output-error-list/output-drops;
 			/* Pierwsze dwie litery oznaczaja typ interfejsu, np. ge, xe, et itd. */	
 			var $type = substring($name, 1, 2);
 
-			if ($type == "ge" || $type == "xe" || $type == "et") {
-				<output> jcs:printf("%-10s %-6s %-10s %-6s", $name, $mtu, $speed, $drops);
-			}
+			<output> jcs:printf("%-10s %-6s %-10s %-6s", $name, $mtu, $speed, $drops);
 		}
 	}
 }
