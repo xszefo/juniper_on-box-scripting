@@ -1,0 +1,23 @@
+version 1.1;
+ns junos = "http://xml.juniper.net/junos/*/junos";
+ns xnm = "http://xml.juniper.net/xnm/1.1/xnm";
+ns jcs = "http://xml.juniper.net/junos/commit-scripts/1.0";
+
+import "../import/junos.xsl";
+
+var $rpc = {
+	<get-interface-information> {
+		<extensive>;
+	}
+}
+
+match  /  {
+	<op-script-results> {
+		<output> jcs:printf("%-15s %-15s", "HOSTNAME", $hostname);
+		<output> jcs:printf("%-15s %-15s", "SCRIPT", $script);
+		<output> jcs:printf("%-15s %-15s", "LOCALTIME", $localtime);
+		<output> jcs:printf("%-15s %-15s", "LOCALTIME-ISO", $localtime-iso);
+		<output> jcs:printf("%-15s %-15s", "PRODUCT", $product);
+		<output> jcs:printf("%-15s %-15s", "USER", $user);
+	}
+}
