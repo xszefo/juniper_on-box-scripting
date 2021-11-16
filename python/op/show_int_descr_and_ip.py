@@ -21,7 +21,7 @@ if __name__ == '__main__':
 	if ip_result:
 	    for ip in ip_result:
 		ip = ip.text.strip()
-                print '{:15} {:20} {:15}'.format(name, description, ip)
+                print('{:15} {:20} {:15}'.format(name, description, ip))
 	else:	
-            print '{:15} {:20}'.format(name, description)
+            print('{:15} {:20}'.format(name, description))
 
