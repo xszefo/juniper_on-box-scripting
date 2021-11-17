@@ -39,7 +39,7 @@
     junos_config:
       provider:
         host: "{{ inventory_hostname }}"
-        username: psroot
+        username: admin
         password: "{{ ansible_ssh_pass }}"
       lines:
       - set system scripts op file "{{ item.item.split('/')[-1] }}" checksum sha-256 "{{ item.stat.checksum }}"
