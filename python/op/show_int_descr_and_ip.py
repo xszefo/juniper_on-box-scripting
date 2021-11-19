@@ -14,7 +14,7 @@ def get_details(interfaces_terse, interfaces_description):
         if len(ip_result) > 0:
             for tmp_ip in ip_result:
                 ip.append(tmp_ip.text.strip())
-        result.append((name, name, ip))
+        result.append((name, description, ip))
     return result
     
 def main():

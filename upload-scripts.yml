@@ -16,12 +16,20 @@
     debug:
       msg: "FILE: {{ item.item }}, CHECKSUM: {{ item.stat.checksum  }}"
     with_items: "{{ checksums.results }}"
-
+  - name: create-variable
+    set_fact:
+      checksums_var: "{{ checksums_var|default([]) + [ { item.item.split('/')[-1] : item.stat.checksum } ] }}"
+    with_items: "{{ checksums.results }}"
+    no_log: true
+  - name: generate-config
+    template:
+      src: "template.j2"
+      dest: "config.set"
 - name: network-device-tasks
-  hosts: lab-leaf
+  hosts: lab-leaf03
   connection: local
   gather_facts: no
-  tasks:
+  tasks:  
   - name: check_netconf_connection
     tags: check_netconf_connection
     wait_for: host="{{ inventory_hostname }}" port=830  timeout=5
@@ -29,7 +37,7 @@
     junos_scp:
       provider:
         host: "{{ inventory_hostname }}"
-        username: admin
+        username: psroot
         password: "{{ ansible_ssh_pass }}"
       src: "{{ item.item }}"
       dest: /var/db/scripts/op
@@ -39,9 +47,7 @@
     junos_config:
       provider:
         host: "{{ inventory_hostname }}"
-        username: admin
+        username: psroot
         password: "{{ ansible_ssh_pass }}"
-      lines:
-      - set system scripts op file "{{ item.item.split('/')[-1] }}" checksum sha-256 "{{ item.stat.checksum }}"
-    with_items: "{{ hostvars['localhost']['checksums'].results }}"
-    no_log: true
+      src: config.set
+
