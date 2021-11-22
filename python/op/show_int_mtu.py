@@ -1,7 +1,18 @@
+#HelpDescription:Display MTU, Speed and Drops of the interfaces
 from jnpr.junos import Device
 from lxml import etree
 import sys
 
+def get_data():
+    with Device() as dev:
+	    interfaces_extensive = dev.rpc.get_interface_information(extensive=True)
+
+    if type(interfaces_extensive) != etree._Element:
+        print('Blad pobierania danych')
+        print('Shoud be ETREE, received: {}'.format(type(interfaces_terse)))
+	sys.exit()
+
+    return interfaces_extensive
 
 def get_details(interfaces_xml):
     result = []
@@ -20,21 +31,17 @@ def get_details(interfaces_xml):
         if any([True for interface in allowed_interfaces if name[:2] == interface]):
             result.append((name, mtu, speed, drops))
     return result
-
-def main():
-    with Device() as dev:
-	    interfaces_extensive = dev.rpc.get_interface_information(extensive=True)
-
-    if type(interfaces_extensive) != etree._Element:
-        print('Blad pobierania danych')
-        print('Shoud be ETREE, received: {}'.format(type(interfaces_terse)))
-	sys.exit()
-
-    result = get_details(interfaces_extensive)
-
+def print_result(result):
     print('{:11} {:6} {:12} {:6}'.format('Interface', 'MTU', 'Speed', 'Drops'))
     for interface, mtu, speed, drops in result:
         print('{:11} {:6} {:12} {:6}'.format(interface, mtu, speed, drops))
+    return True
+
+def main():
+    interfaces_extensive = get_data()
+    result = get_details(interfaces_extensive)
+
+    print_result(result)
     
 if __name__ == '__main__':
     main()

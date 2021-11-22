@@ -1,6 +1,13 @@
 delete system scripts op
+
 {% for file in checksums_var %}
 {% for filepath, checksum  in file.items() %}
 set system scripts op file {{ filepath }} checksum sha-256 {{ checksum }}
+{% endfor %}
+{% endfor %}
+
+{% for file in descriptions_var %}
+{% for filepath, description  in file.items() %}
+set system scripts op file {{ filepath }} description "{{ description }}"
 {% endfor %}
 {% endfor %}

@@ -9,17 +9,30 @@
       path: "{{ item }}"
       checksum_algorithm: sha256
       get_checksum: yes
-    register: checksums
     with_fileglob: scripts/*.py
     no_log: true
+    register: checksums
+  - name: get-script-help-description
+    shell: "grep HelpDescription {{ item }}"
+    with_fileglob: scripts/*.py
+    register: descriptions
+  - name: show-description
+    debug:
+      msg: "{{ item.item}} {{ item.stdout }}"
+    with_items: "{{ descriptions.results }}"
   - name: show-checksum
     debug:
       msg: "FILE: {{ item.item }}, CHECKSUM: {{ item.stat.checksum  }}"
     with_items: "{{ checksums.results }}"
-  - name: create-variable
+  - name: create-checksum-variable
     set_fact:
       checksums_var: "{{ checksums_var|default([]) + [ { item.item.split('/')[-1] : item.stat.checksum } ] }}"
     with_items: "{{ checksums.results }}"
+    no_log: true
+  - name: create-help-description-variable
+    set_fact:
+      descriptions_var: "{{ descriptions_var|default([]) + [ { item.item.split('/')[-1] : item.stdout.split(':')[-1] } ] }}"
+    with_items: "{{ descriptions.results }}"
     no_log: true
   - name: generate-config
     template:
