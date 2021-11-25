@@ -4,6 +4,7 @@
   connection: local
   gather_facts: no
   tasks:
+  # Calculating SHA256 checksum which is going to be used in the JUNOS command
   - name: calculate-sha256-checksum
     stat:
       path: "{{ item }}"
@@ -12,28 +13,24 @@
     with_fileglob: scripts/*.py
     no_log: true
     register: checksums
+  # Extracting summary of the script which is going to be used in the JUNOS command
   - name: get-script-help-description
     shell: "grep HelpDescription {{ item }}"
     with_fileglob: scripts/*.py
     register: descriptions
-  - name: show-description
-    debug:
-      msg: "{{ item.item}} {{ item.stdout }}"
-    with_items: "{{ descriptions.results }}"
-  - name: show-checksum
-    debug:
-      msg: "FILE: {{ item.item }}, CHECKSUM: {{ item.stat.checksum  }}"
-    with_items: "{{ checksums.results }}"
+  # Creating checksum variable which is going to be used in JINJA2 template
   - name: create-checksum-variable
     set_fact:
       checksums_var: "{{ checksums_var|default([]) + [ { item.item.split('/')[-1] : item.stat.checksum } ] }}"
     with_items: "{{ checksums.results }}"
     no_log: true
+  # Creating description variable which is going to be used in JINJA2 template
   - name: create-help-description-variable
     set_fact:
       descriptions_var: "{{ descriptions_var|default([]) + [ { item.item.split('/')[-1] : item.stdout.split(':')[-1] } ] }}"
     with_items: "{{ descriptions.results }}"
     no_log: true
+  # Generating config file based on the template and variables
   - name: generate-config
     template:
       src: "template.j2"
@@ -46,6 +43,7 @@
   - name: check_netconf_connection
     tags: check_netconf_connection
     wait_for: host="{{ inventory_hostname }}" port=830  timeout=5
+  # Uploading scripts to location /var/db/scripts/op
   - name: upload-scripts-to-device
     junos_scp:
       provider:
@@ -56,6 +54,7 @@
       dest: /var/db/scripts/op
     with_items: "{{ hostvars['localhost']['checksums'].results }}"
     no_log: true
+  # Adding scripts to configuration, each with the description and checksum
   - name: add-scripts-to-configuration
     junos_config:
       provider:

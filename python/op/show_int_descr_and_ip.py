@@ -5,6 +5,11 @@ import sys
 import argparse
 
 def get_data(interface):
+    """
+    Function to get a result of the commands: 
+    - show interfaces terse
+    - show interfaces description
+    """
     with Device() as dev:
         if interface is not None:
             interfaces_terse = dev.rpc.get_interface_information(terse=True, interface_name=interface)
@@ -17,10 +22,12 @@ def get_data(interface):
         print('Blad pobierania danych')
         print('Terse - {}\nDescription - {}'.format(type(interfaces_terse), type(interfaces_description)))
         sys.exit()
-
     return interfaces_terse, interfaces_description
 
 def get_details(interfaces_terse, interfaces_description):
+    """
+    Function to extract parameters from the XML result.
+    """
     result = []
 
     for interface in interfaces_description.iter('physical-interface'):
@@ -57,7 +64,6 @@ def main():
 
     interfaces_terse, interfaces_description = get_data(interface)
     result = get_details(interfaces_terse, interfaces_description)
-
     print_result(result)
 
 if __name__ == '__main__':
