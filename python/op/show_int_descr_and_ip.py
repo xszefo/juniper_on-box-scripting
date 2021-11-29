@@ -43,14 +43,51 @@ def get_details(interfaces_terse, interfaces_description):
     return result
     
 def print_result(result):
-    print('{:15} {:20} {:15}'.format('Name', 'Description', 'IP'))
+    """ 
+    Wyliczenie najdluzszego wyniku z kazdej kolumny
+    1. Na poczatku tworze liste 0 i jej dlugosc jest rowna liczbie kolumn.
+    2. Dla kazdego interfejsu (res) wyciagam jego wszystkie parametry razem z indexami
+    3. Jezeli dlugosc parametru dla danego indeksu jest wieksza niz maksymalna dlugosc dla tego indeksu, to wstawiam ja do listy
+    4. Tworze zmienne _length dla kadzego parametru, do kazdej z nich dodaje 1 aby rozsunac od siebie wyniki
+    """
+    max_length = [0] * len(result[0])
+    for res in result:
+        for index, value in enumerate(res):
+            if len(value) > max_length[index]:
+                max_length[index] = len(value)
+    name_length, desc_length, ip_length = [max + 1 for max in max_length]
+
+    print('{:{name_length}} {:{desc_length}} {:{ip_length}}'.format(
+        'Name', 
+        'Description', 
+        'IP', 
+        name_length=name_length, 
+        desc_length=desc_length, 
+        ip_length=ip_length))
+
     for name, description, ips in result:
         if len(ips) > 0:
-            print('{:15} {:20} {:15}'.format(name, description, ips[0]))
+            print('{:{name_length}} {:{desc_length}} {:{ip_length}}'.format(
+                name, 
+                description, 
+                ips[0], 
+                name_length=name_length, 
+                desc_length=desc_length, 
+                ip_length=ip_length))
             for ip in ips[1:]:
-                print('{:15} {:20} {:15}'.format('','', ip))
+                print('{:{name_length}} {:{desc_length}} {:{ip_length}}'.format(
+                '',
+                '', 
+                ip,
+                name_length=name_length, 
+                desc_length=desc_length, 
+                ip_length=ip_length))
         else:
-            print('{:15} {:20}'.format(name, description))
+            print('{:{name_length}} {:{desc_length}}'.format(
+                name, 
+                description,
+                name_length=name_length, 
+                desc_length=desc_length))
     return True
 
 arguments = {'interface': 'Name of interface to display'}
